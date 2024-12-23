@@ -1,7 +1,7 @@
 > **THIS REPOSITORY IS NOT MAINTAINED ANYMORE**
 
 # Installation Guide 
-1. Clone this repository in preffered path: 
+1. Clone this repository in preferred path: 
 ```python
 git clone https://github.com/BohdanChuprynka/Sentiment-Analysis-Model.git
 ```
