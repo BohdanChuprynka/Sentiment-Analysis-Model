@@ -16,4 +16,4 @@ python sentiment_model.py
 *** Make sure you have enough resources to run the processing of the model. ***
 
 # Background 
-The Sentiment Analysis Model is my first official project in Data Science. The goal of this repository was to bring practical knowledge and get more experience in end-to-end ML applications. As a result, I highly appreciate the decision to start this journey, as it brought me a desire for further improvements, making an incredible impact on my professional career. The official end date of this project is April 26, 2024.
+The Sentiment Analysis Model is my first official project in Data Science. The goal of this repository was to bring practical knowledge and get more experience in building end-to-end ML applications. As a result, I highly appreciate the decision to start this coding journey, as it brought me a desire for further improvements, making an incredible impact on my professional career. The official end date of this project is April 26, 2024.
