@@ -1,4 +1,9 @@
-"""Text preprocessing pipeline for sentiment analysis on tweets."""
+"""Text preprocessing pipeline for sentiment analysis on tweets.
+
+Two strategies:
+- preprocess_text()    — Heavy preprocessing for traditional ML (NB, Logistic Regression).
+- preprocess_text_dl() — Light preprocessing for deep learning (USE, Hybrid).
+"""
 
 import string
 import regex as re
@@ -89,7 +94,8 @@ def remove_duplicate_whitespace(text):
 
 
 def preprocess_text(text):
-    """Full preprocessing pipeline for a single tweet."""
+    """Heavy preprocessing for traditional ML models (NB, Logistic Regression).
+    Strips everything down to clean tokens for bag-of-words approaches."""
     text = delete_html_tags(text)
     text = delete_url(text)
     text = remove_mention(text)
@@ -101,6 +107,18 @@ def preprocess_text(text):
     return text
 
 
+def preprocess_text_dl(text):
+    """Light preprocessing for deep learning models.
+    Preserves casing, punctuation patterns, and natural language structure
+    that neural networks can learn from. Only removes noise (HTML, URLs)."""
+    text = delete_html_tags(text)
+    text = delete_url(text)
+    text = re.sub(r"@\w+", "@user", text)
+    text = replace_chat_words(text)
+    text = remove_duplicate_whitespace(text)
+    return text.strip()
+
+
 def split_chars(text):
-    """Split text into space-separated characters."""
+    """Split text into space-separated characters (for character-level embeddings)."""
     return " ".join(list(text))

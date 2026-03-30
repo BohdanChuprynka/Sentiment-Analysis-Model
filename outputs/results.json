@@ -1,20 +1,32 @@
 {
-  "Naive Bayes (Baseline)": {
-    "accuracy": 76.58,
-    "precision": 0.7661,
-    "recall": 0.7658,
-    "f1": 0.7658
+  "Naive Bayes": {
+    "accuracy": 0.761,
+    "precision": 0.761,
+    "recall": 0.761,
+    "f1": 0.761
   },
-  "USE Embeddings": {
-    "accuracy": 76.48,
-    "precision": 0.7655,
-    "recall": 0.7648,
-    "f1": 0.7646
+  "Logistic Regression": {
+    "accuracy": 0.787,
+    "precision": 0.787,
+    "recall": 0.787,
+    "f1": 0.787
   },
-  "Hybrid (Token + Char)": {
-    "accuracy": 74.62,
-    "precision": 0.7567,
-    "recall": 0.7462,
-    "f1": 0.7435
+  "USE (Frozen)": {
+    "accuracy": 0.805,
+    "precision": 0.805,
+    "recall": 0.805,
+    "f1": 0.805
+  },
+  "USE (Fine-tuned)": {
+    "accuracy": 0.804,
+    "precision": 0.804,
+    "recall": 0.804,
+    "f1": 0.804
+  },
+  "Hybrid (Token+Char)": {
+    "accuracy": 0.806,
+    "precision": 0.806,
+    "recall": 0.806,
+    "f1": 0.805
   }
 }

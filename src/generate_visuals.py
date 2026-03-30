@@ -8,6 +8,7 @@ Usage:
 """
 
 import os
+import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,7 +22,6 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(ROOT_DIR, "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-# Color palette
 COLORS = {
     "primary": "#2563EB",
     "secondary": "#7C3AED",
@@ -31,48 +31,49 @@ COLORS = {
     "bg": "#FFFFFF",
     "text": "#1E293B",
 }
-MODEL_COLORS = ["#2563EB", "#7C3AED", "#0EA5E9"]
+MODEL_COLORS = ["#2563EB", "#7C3AED", "#0EA5E9", "#F59E0B", "#10B981"]
 
 
 def generate_model_comparison(results_dict, save_path=None):
-    """
-    Generate a grouped bar chart comparing model metrics.
-
-    Args:
-        results_dict: Dict of {model_name: {metric: value}} for each model.
-        save_path: Path to save the image. Defaults to images/model_comparison.png.
-    """
+    """Grouped bar chart comparing model metrics (supports up to 5 models)."""
     if save_path is None:
         save_path = os.path.join(IMAGES_DIR, "model_comparison.png")
 
-    df = pd.DataFrame(results_dict).T
-    metrics = df.columns.tolist()
-    models = df.index.tolist()
+    df_plot = pd.DataFrame(results_dict).T
+    metrics = df_plot.columns.tolist()
+    models = df_plot.index.tolist()
+    n_models = len(models)
     x = np.arange(len(metrics))
-    width = 0.25
+    width = 0.8 / n_models
 
-    fig, ax = plt.subplots(figsize=(12, 6.75))
+    fig, ax = plt.subplots(figsize=(14, 7))
     fig.patch.set_facecolor(COLORS["bg"])
     ax.set_facecolor(COLORS["bg"])
 
-    for i, (model, color) in enumerate(zip(models, MODEL_COLORS)):
-        values = df.loc[model].values
-        bars = ax.bar(x + i * width, values, width, label=model, color=color,
+    for i, (model, color) in enumerate(zip(models, MODEL_COLORS[:n_models])):
+        values = df_plot.loc[model].values
+        offset = (i - n_models / 2 + 0.5) * width
+        bars = ax.bar(x + offset, values, width, label=model, color=color,
                       edgecolor="white", linewidth=0.5, zorder=3)
         for bar, val in zip(bars, values):
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
-                    f"{val:.2f}", ha="center", va="bottom", fontsize=9,
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.003,
+                    f"{val:.3f}", ha="center", va="bottom", fontsize=8,
                     color=COLORS["text"], fontweight="medium")
 
     ax.set_xlabel("Metric", fontsize=13, color=COLORS["text"], labelpad=10)
     ax.set_ylabel("Score", fontsize=13, color=COLORS["text"], labelpad=10)
     ax.set_title("Sentiment Analysis — Model Performance Comparison",
                  fontsize=16, fontweight="bold", color=COLORS["text"], pad=20)
-    ax.set_xticks(x + width)
+    ax.set_xticks(x)
     ax.set_xticklabels([m.replace("_", " ").title() for m in metrics],
                        fontsize=11, color=COLORS["text"])
-    ax.set_ylim(0, 1.12)
-    ax.legend(fontsize=11, loc="upper right", framealpha=0.9)
+
+    all_vals = df_plot.values.flatten()
+    y_min = max(0, all_vals.min() - 0.05)
+    y_max = min(1.0, all_vals.max() + 0.04)
+    ax.set_ylim(y_min, y_max)
+
+    ax.legend(fontsize=10, loc="lower right", framealpha=0.9)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["left"].set_color("#E2E8F0")
@@ -88,44 +89,45 @@ def generate_model_comparison(results_dict, save_path=None):
 
 
 def generate_thumbnail(results_dict, save_path=None):
-    """
-    Generate a 16:9 portfolio thumbnail with model comparison.
-
-    Args:
-        results_dict: Dict of {model_name: {metric: value}}.
-        save_path: Path to save. Defaults to images/project_thumbnail.png.
-    """
+    """16:9 dark portfolio thumbnail with model comparison."""
     if save_path is None:
         save_path = os.path.join(IMAGES_DIR, "project_thumbnail.png")
 
-    df = pd.DataFrame(results_dict).T
-    metrics = df.columns.tolist()
-    models = df.index.tolist()
+    df_plot = pd.DataFrame(results_dict).T
+    metrics = df_plot.columns.tolist()
+    models = df_plot.index.tolist()
+    n_models = len(models)
     x = np.arange(len(metrics))
-    width = 0.25
+    width = 0.8 / n_models
 
     fig, ax = plt.subplots(figsize=(16, 9))
     fig.patch.set_facecolor("#0F172A")
     ax.set_facecolor("#0F172A")
 
-    for i, (model, color) in enumerate(zip(models, MODEL_COLORS)):
-        values = df.loc[model].values
-        bars = ax.bar(x + i * width, values, width, label=model, color=color,
+    for i, (model, color) in enumerate(zip(models, MODEL_COLORS[:n_models])):
+        values = df_plot.loc[model].values
+        offset = (i - n_models / 2 + 0.5) * width
+        bars = ax.bar(x + offset, values, width, label=model, color=color,
                       edgecolor="none", zorder=3, alpha=0.9)
         for bar, val in zip(bars, values):
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.008,
-                    f"{val:.2f}", ha="center", va="bottom", fontsize=12,
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
+                    f"{val:.3f}", ha="center", va="bottom", fontsize=10,
                     color="white", fontweight="medium")
 
     ax.set_xlabel("Metric", fontsize=15, color="white", labelpad=12)
     ax.set_ylabel("Score", fontsize=15, color="white", labelpad=12)
     ax.set_title("Sentiment Analysis on 1.6M Tweets\nModel Performance Comparison",
                  fontsize=22, fontweight="bold", color="white", pad=25)
-    ax.set_xticks(x + width)
+    ax.set_xticks(x)
     ax.set_xticklabels([m.replace("_", " ").title() for m in metrics],
                        fontsize=13, color="white")
-    ax.set_ylim(0, 1.15)
-    ax.legend(fontsize=13, loc="upper right", facecolor="#1E293B",
+
+    all_vals = df_plot.values.flatten()
+    y_min = max(0, all_vals.min() - 0.05)
+    y_max = min(1.0, all_vals.max() + 0.04)
+    ax.set_ylim(y_min, y_max)
+
+    ax.legend(fontsize=12, loc="lower right", facecolor="#1E293B",
               edgecolor="#334155", labelcolor="white")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -142,14 +144,7 @@ def generate_thumbnail(results_dict, save_path=None):
 
 
 def generate_sentiment_distribution(positive_count, negative_count, save_path=None):
-    """
-    Generate a clean sentiment class distribution bar chart.
-
-    Args:
-        positive_count: Number of positive samples.
-        negative_count: Number of negative samples.
-        save_path: Path to save. Defaults to images/sentiment_distribution.png.
-    """
+    """Sentiment class distribution bar chart."""
     if save_path is None:
         save_path = os.path.join(IMAGES_DIR, "sentiment_distribution.png")
 
@@ -186,13 +181,7 @@ def generate_sentiment_distribution(positive_count, negative_count, save_path=No
 
 
 def generate_wordcloud(text_series, save_path=None):
-    """
-    Generate a styled word cloud from preprocessed tweet text.
-
-    Args:
-        text_series: Pandas Series of preprocessed text strings.
-        save_path: Path to save. Defaults to images/wordcloud.png.
-    """
+    """Word cloud from preprocessed tweet text."""
     if save_path is None:
         save_path = os.path.join(IMAGES_DIR, "wordcloud.png")
 
@@ -220,41 +209,26 @@ def generate_wordcloud(text_series, save_path=None):
 
 
 if __name__ == "__main__":
-    # --- Example usage with placeholder results ---
-    # Replace these with your actual model results after training.
+    results_path = os.path.join(ROOT_DIR, "outputs", "results.json")
+    if os.path.exists(results_path):
+        with open(results_path) as f:
+            results = json.load(f)
+        print(f"Loaded results from {results_path}")
+    else:
+        results = {
+            "Naive Bayes": {"accuracy": 0.761, "precision": 0.761, "recall": 0.761, "f1": 0.761},
+            "Logistic Regression": {"accuracy": 0.787, "precision": 0.787, "recall": 0.787, "f1": 0.787},
+            "USE (Frozen)": {"accuracy": 0.805, "precision": 0.805, "recall": 0.805, "f1": 0.805},
+            "USE (Fine-tuned)": {"accuracy": 0.804, "precision": 0.804, "recall": 0.804, "f1": 0.804},
+            "Hybrid (Token+Char)": {"accuracy": 0.806, "precision": 0.806, "recall": 0.806, "f1": 0.805},
+        }
+        print("Using default results (no results.json found)")
 
-    sample_results = {
-        "Naive Bayes (Baseline)": {
-            "accuracy": 0.77,
-            "precision": 0.77,
-            "recall": 0.77,
-            "f1": 0.77,
-        },
-        "USE Embeddings": {
-            "accuracy": 0.81,
-            "precision": 0.81,
-            "recall": 0.81,
-            "f1": 0.81,
-        },
-        "Hybrid (Token + Char)": {
-            "accuracy": 0.79,
-            "precision": 0.79,
-            "recall": 0.79,
-            "f1": 0.79,
-        },
-    }
+    print("Generating visuals...\n")
+    generate_model_comparison(results)
+    generate_thumbnail(results)
+    generate_sentiment_distribution(positive_count=800_000, negative_count=800_000)
 
-    print("Generating visuals with placeholder data...")
-    print("Replace the results dict with your actual model outputs.\n")
-
-    generate_model_comparison(sample_results)
-    generate_thumbnail(sample_results)
-    generate_sentiment_distribution(
-        positive_count=800_000,
-        negative_count=800_000,
-    )
-
-    print("\nWord cloud generation requires preprocessed tweet data.")
-    print("Uncomment and run with your DataFrame after preprocessing:")
-    print("  generate_wordcloud(df['text'])")
+    print("\nWord cloud requires preprocessed tweet data.")
+    print("Run the full pipeline or notebook to generate it.")
     print(f"\nAll images saved to: {IMAGES_DIR}/")
